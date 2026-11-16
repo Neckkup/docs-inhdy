@@ -17,6 +17,21 @@
 
 ชื่อโปรเจกต์ใช้ได้แค่ `a-z 0-9 -`
 
+## Deploy อัตโนมัติจาก GitHub
+
+push เข้า `main` แล้วเว็บอัปเดตเองภายใน ~1 นาที รวมถึงโฟลเดอร์ใหม่ใน `sites/` (ได้ซับโดเมน + HTTPS ให้เลย)
+
+ติดตั้งครั้งเดียวบนเซิร์ฟเวอร์ (ในโฟลเดอร์ repo ที่อยู่บน branch `main`):
+
+```bash
+sudo ./auto-deploy.sh --install
+```
+
+- systemd timer เรียก `auto-deploy.sh` ทุก 1 นาที: `git fetch` → ถ้ามี commit ใหม่ก็ pull แล้วรัน `deploy.sh`
+- ดู log: `journalctl -u docs-auto-deploy -f` · ถอน: `sudo ./auto-deploy.sh --uninstall`
+- เครื่องต้อง `git fetch` จาก GitHub ได้โดยไม่ถามรหัส (repo private ใช้ deploy key แบบอ่านอย่างเดียว)
+- อย่าแก้ไฟล์ค้างบนเซิร์ฟเวอร์โดยไม่ commit — pull จะไม่ผ่านจนกว่าจะเคลียร์
+
 ## Artifact ที่รองรับ
 
 | ประเภท | ผลลัพธ์ | ตัวแปลง |
@@ -31,6 +46,7 @@
 ## โครงสร้าง
 
 ```
+auto-deploy.sh     pull จาก GitHub + deploy อัตโนมัติ (systemd timer)
 deploy.sh          สร้าง compose.yml + หน้ารวมจาก sites/ แล้ว deploy
 new-project.sh     สร้างโปรเจกต์ใหม่ + deploy
 nginx.conf         ซับโดเมน -> sites/<ชื่อ>/

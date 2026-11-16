@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>วิธีเพิ่มหน้า</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap">
+<link rel="stylesheet" href="assets/page.css">
+<script src="assets/page.js"></script>
+</head>
+<body>
+<main>
+  <p class="eyebrow">สำหรับผู้เขียน</p>
+  <h1>วิธีเพิ่มหน้า</h1>
+  <p class="lead">ทุกหน้าคือไฟล์ HTML หนึ่งไฟล์ แล้วลงทะเบียนไว้ใน <code>canvas.json</code> — ลบหน้านี้ได้เมื่อไม่ต้องใช้</p>
+
+  <ol class="steps">
+    <li>คัดลอก <code>welcome.html</code> เป็นไฟล์ใหม่ เช่น <code>setup.html</code> แล้วแก้เนื้อหา</li>
+    <li>เพิ่มบรรทัดใน <code>canvas.json</code> ส่วน <code>boards</code>:
+      <pre><code>{ "file": "setup.html", "title": "การติดตั้ง" }</code></pre>
+      ไม่ต้องใส่ตำแหน่ง ระบบจะจัดเรียงให้ (แถวละ 3 หน้า)</li>
+    <li>เปิดเว็บใหม่ — เสร็จ ไม่ต้อง deploy</li>
+  </ol>
+
+  <h2>จัดวางเอง</h2>
+  <p>ใส่ <code>x</code>, <code>y</code> (และ <code>w</code>, <code>h</code> ถ้าหน้าสูงกว่า 1000px) เพื่อกำหนดตำแหน่งบน canvas:</p>
+  <pre><code>{ "file": "api.html", "title": "API", "x": 0, "y": 1220, "w": 1440, "h": 1400 }</code></pre>
+
+  <h2>แบ่งเป็นหลาย page</h2>
+  <p>เพิ่ม <code>pages</code> แล้วใส่ <code>"page"</code> ให้แต่ละหน้า — จะมีแท็บด้านบนให้สลับ:</p>
+  <pre><code>"pages": [{ "id": "p1", "name": "ภาพรวม" }, { "id": "p2", "name": "รายละเอียด" }]</code></pre>
+
+  <h2>ชิ้นส่วนที่ใช้ได้</h2>
+  <div class="table-wrap"><table>
+    <tr><th>class</th><th>ใช้ทำ</th></tr>
+    <tr><td><code>.eyebrow</code></td><td>ป้ายเล็กเหนือหัวข้อ</td></tr>
+    <tr><td><code>.lead</code></td><td>ย่อหน้าเปิด</td></tr>
+    <tr><td><code>.cards</code> + <code>.card</code></td><td>การ์ดเรียงกริด</td></tr>
+    <tr><td><code>.callout</code> / <code>.callout.warn</code></td><td>กล่องเน้น / คำเตือน</td></tr>
+    <tr><td><code>ol.steps</code></td><td>ขั้นตอนมีเลขวงกลม</td></tr>
+    <tr><td><code>.table-wrap</code></td><td>ครอบตารางกว้างให้เลื่อนได้บนมือถือ</td></tr>
+  </table></div>
+
+  <div class="callout warn">ทุกไฟล์ในโปรเจกต์นี้เปิดให้ทุกคนดูได้ อย่าใส่ข้อมูลลับ</div>
+</main>
+</body>
+</html>

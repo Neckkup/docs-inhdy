@@ -1,0 +1,43 @@
+# ไฟล์นี้สร้างโดย deploy.sh — อย่าแก้มือ
+services:
+  docs:
+    image: nginx:1.27-alpine
+    container_name: docs
+    restart: unless-stopped
+    volumes:
+      - ./sites:/srv/sites:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks: [public]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=public
+      - traefik.http.services.docs.loadbalancer.server.port=80
+      - traefik.http.routers.docs-main.rule=Host(`docs.inhdy.com`)
+      - traefik.http.routers.docs-main.entrypoints=websecure
+      - traefik.http.routers.docs-main.tls=true
+      - traefik.http.routers.docs-main.tls.certresolver=inhdy-public
+      - traefik.http.routers.docs-main.service=docs
+      - traefik.http.routers.docs-app.rule=Host(`docs.app.inhdy.com`)
+      - traefik.http.routers.docs-app.entrypoints=websecure
+      - traefik.http.routers.docs-app.tls=true
+      - traefik.http.routers.docs-app.tls.certresolver=inhdy-public
+      - traefik.http.routers.docs-app.service=docs
+      - traefik.http.routers.docs-p-alert.rule=Host(`alert.docs.inhdy.com`)
+      - traefik.http.routers.docs-p-alert.entrypoints=websecure
+      - traefik.http.routers.docs-p-alert.tls=true
+      - traefik.http.routers.docs-p-alert.tls.certresolver=inhdy-public
+      - traefik.http.routers.docs-p-alert.service=docs
+      - traefik.http.routers.docs-p-example.rule=Host(`example.docs.inhdy.com`)
+      - traefik.http.routers.docs-p-example.entrypoints=websecure
+      - traefik.http.routers.docs-p-example.tls=true
+      - traefik.http.routers.docs-p-example.tls.certresolver=inhdy-public
+      - traefik.http.routers.docs-p-example.service=docs
+      - traefik.http.routers.docs-p-why-steamkid.rule=Host(`why-steamkid.docs.inhdy.com`)
+      - traefik.http.routers.docs-p-why-steamkid.entrypoints=websecure
+      - traefik.http.routers.docs-p-why-steamkid.tls=true
+      - traefik.http.routers.docs-p-why-steamkid.tls.certresolver=inhdy-public
+      - traefik.http.routers.docs-p-why-steamkid.service=docs
+
+networks:
+  public:
+    external: true

@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ตรวจอัตนัย · ALERT</title>
+<script src="./dc-lite.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.alert{--chrome:#ECEDE6;--surface:#FFFFFF;--surface-2:#F6F6F1;--surface-3:#EFEFE8;--selected:#FFFFFF;--border:#D9DACF;--border-strong:#B9BBAA;--track:#DCDDD2;--text:#1C1D17;--text-muted:#595B4D;--text-disabled:#9B9D8C;--primary:#5C5E4F;--primary-hover:#484A3E;--on-primary:#FFFFFF;--primary-soft:#E6E7DD;--accent:#7E5F32;--accent-soft:#F1E8D8;--rail:#35372E;--on-rail:#DCDDCD;--rail-hover:rgba(255,255,255,.06);--rail-active-bg:rgba(255,255,255,.10);--rail-active:#D9B97F;--success:#3B7549;--success-soft:#E3EFE6;--warning:#935D10;--warning-soft:#F6EAD3;--danger:#B0412E;--danger-soft:#F5E1DC;--info:#3B6B8F;--info-soft:#DFE9F1;--shadow-xs:0 1px 3px rgba(35,36,29,.12);--shadow-sm:0 2px 6px rgba(35,36,29,.08),0 1px 2px rgba(35,36,29,.06);color-scheme:light;font-family:'Kanit','Noto Sans Thai',system-ui,sans-serif;font-weight:300;font-size:15px;line-height:1.6;color:var(--text);background:var(--chrome)}
+.alert.dark{color-scheme:dark;--chrome:#121310;--surface:#1E1F1A;--surface-2:#24251F;--surface-3:#2A2B24;--selected:#2A2B24;--border:#33352D;--border-strong:#4A4C41;--track:#3A3C33;--text:#ECEDE4;--text-muted:#A9AB98;--text-disabled:#5E6053;--primary:#B4B79C;--primary-hover:#C8CAB3;--on-primary:#1A1B16;--primary-soft:#33352B;--accent:#D4B17C;--accent-soft:#3A3224;--rail:#2A2C23;--success:#7FBF8E;--success-soft:#1F3326;--warning:#E0A955;--warning-soft:#3A2C17;--danger:#E08A76;--danger-soft:#3B221C;--info:#86B2D4;--info-soft:#1C2C38;--shadow-xs:0 1px 3px rgba(0,0,0,.40);--shadow-sm:0 2px 6px rgba(0,0,0,.45)}
+.alert *{box-sizing:border-box}
+.alert button,.alert input,.alert textarea{font-family:inherit}
+.alert :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.alert .rail-item:hover{background:var(--rail-hover);color:#FFFFFF}
+.alert .rail-item:focus-visible{outline-color:var(--rail-active)}
+.alert .row:hover{background:var(--surface-3)}
+.alert .btn2:hover,.alert .ghost:hover{background:var(--surface-3)}
+.alert .btn1:hover{background:var(--primary-hover)}
+.alert .icon-btn:hover{background:var(--surface-3);color:var(--text)}
+@media (max-width:640px){
+.alert .shell{flex-direction:column-reverse}
+.alert .rail{flex-direction:row !important;width:100% !important;margin:0 !important;border-radius:0 !important;justify-content:space-around;padding:6px 0 !important}
+.alert .rail-secondary,.alert .rail-more{display:none !important}
+.alert .main{margin:0 !important;border-radius:0 !important;padding:20px 16px !important}
+.alert .search{display:none !important}
+.alert .panel{max-width:none !important;padding:0 16px 16px !important}
+}
+</style>
+</helmet>
+<div class="alert {{theme}}" style="min-height: 1000px; display: flex; flex-direction: column;">
+
+<header style="height: 60px; flex-shrink: 0; display: flex; align-items: center; gap: 16px; padding: 0 16px 0 0;">
+<a href="#" style="width: 72px; display: flex; flex-direction: column; align-items: center; color: var(--primary); text-decoration: none; font-size: 12px; font-weight: 600; line-height: 1.2;">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg>
+ALERT</a>
+<div style="flex: 1; display: flex; justify-content: center; min-width: 0;">
+<label class="search" style="width: 100%; max-width: 720px; height: 40px; display: flex; align-items: center; gap: 10px; padding: 0 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text-muted);">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+<span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);">ค้นหา</span>
+<input type="search" placeholder="ค้นหารายวิชา ผู้เรียน หรือข้อสอบ" style="flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--text); font-size: 15px; font-weight: 300;">
+</label>
+</div>
+<div style="display: flex; align-items: center; gap: 8px;">
+<button type="button" class="icon-btn" aria-label="สลับธีมสว่าง/มืด" style="width: 40px; height: 40px; border: 0; border-radius: 8px; background: transparent; color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer;">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
+</button>
+<div style="position: relative; width: 40px; height: 40px; border-radius: 999px; border: 1px solid var(--border); background: var(--primary-soft); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500;" aria-label="ร.ท. ธนกร (ออนไลน์)">ธก
+<span aria-hidden="true" style="position: absolute; right: -1px; bottom: -1px; width: 11px; height: 11px; border-radius: 999px; background: var(--success); border: 2px solid var(--chrome);"></span>
+</div>
+</div>
+</header>
+
+<div class="shell" style="flex: 1; display: flex; min-height: 0;">
+
+<nav class="rail" aria-label="เมนูหลัก" style="width: 72px; flex-shrink: 0; margin: 0; padding: 8px 0 10px; border-radius: 0; background: var(--rail); display: flex; flex-direction: column; align-items: center; gap: 4px;">
+<a href="#" class="rail-item" style="position: relative; width: 64px; padding: 8px 0 6px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; font-weight: 400; line-height: 1.3; text-decoration: none; color: var(--on-rail);">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+หน้าหลัก</a>
+<a href="#" class="rail-item" style="position: relative; width: 64px; padding: 8px 0 6px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; font-weight: 400; line-height: 1.3; text-decoration: none; color: var(--on-rail);">
+<span style="position: absolute; top: 2px; right: 10px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 999px; background: #E08A76; color: #1A1B16; border: 2px solid var(--rail); font-size: 11px; font-weight: 600; line-height: 14px; text-align: center;">5</span>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
+กิจกรรม</a>
+<a href="#" class="rail-item" style="position: relative; width: 64px; padding: 8px 0 6px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; font-weight: 400; line-height: 1.3; text-decoration: none; color: var(--on-rail);">
+<span style="position: absolute; top: 2px; right: 10px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 999px; background: #E08A76; color: #1A1B16; border: 2px solid var(--rail); font-size: 11px; font-weight: 600; line-height: 14px; text-align: center;">3</span>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>
+แชท</a>
+<a href="#" class="rail-item" style="position: relative; width: 64px; padding: 8px 0 6px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; font-weight: 400; line-height: 1.3; text-decoration: none; color: var(--on-rail);">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+ห้องเรียน</a>
+<a href="#" class="rail-item rail-more" style="position: relative; width: 64px; padding: 8px 0 6px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; font-weight: 400; line-height: 1.3; text-decoration: none; color: var(--on-rail);">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>
+ปฏิทิน</a>
+<a href="#" class="rail-item" aria-current="page" style="position: relative; width: 64px; padding: 8px 0 6px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; font-weight: 500; line-height: 1.3; text-decoration: none; color: var(--rail-active); background: var(--rail-active-bg);">
+<span aria-hidden="true" style="position: absolute; left: -4px; top: 50%; width: 4px; height: 24px; margin-top: -12px; border-radius: 4px; background: var(--rail-active);"></span>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="m9 14 2 2 4-4"></path></svg>
+งาน</a>
+<a href="#" class="rail-item rail-more" style="position: relative; width: 64px; padding: 8px 0 6px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; font-weight: 400; line-height: 1.3; text-decoration: none; color: var(--on-rail);">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"></path><rect x="2" y="6" width="14" height="12" rx="2"></rect></svg>
+เรียนสด</a>
+<a href="#" class="rail-item rail-more" style="position: relative; width: 64px; padding: 8px 0 6px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; font-weight: 400; line-height: 1.3; text-decoration: none; color: var(--on-rail);">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"></path></svg>
+ไฟล์</a>
+<a href="#" class="rail-item rail-more" style="position: relative; width: 64px; padding: 8px 0 6px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; font-weight: 400; line-height: 1.3; text-decoration: none; color: var(--on-rail);">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"></path><path d="M19 3v4"></path><path d="M17 5h4"></path></svg>
+ผู้ช่วย</a>
+<a href="#" class="rail-item rail-more" style="position: relative; width: 64px; padding: 8px 0 6px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; font-weight: 400; line-height: 1.3; text-decoration: none; color: var(--on-rail);">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14"></path><path d="M12 6v14"></path><path d="M8 8v12"></path><path d="M4 4v16"></path></svg>
+ความรู้</a>
+<div class="rail-secondary" style="flex: 1;"></div>
+<div class="rail-secondary" aria-hidden="true" style="width: 32px; height: 1px; margin: 2px 0; background: rgba(255,255,255,.12);"></div>
+<a href="#" class="rail-item rail-secondary" style="position: relative; width: 64px; padding: 8px 0 6px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; font-weight: 400; line-height: 1.3; text-decoration: none; color: var(--on-rail);">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="3" rx="1"></rect><rect width="7" height="7" x="14" y="14" rx="1"></rect><rect width="7" height="7" x="3" y="14" rx="1"></rect></svg>
+แอป</a>
+<a href="#" class="rail-item rail-secondary" style="position: relative; width: 64px; padding: 8px 0 6px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; font-weight: 400; line-height: 1.3; text-decoration: none; color: var(--on-rail);">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg>
+ช่วยเหลือ</a>
+</nav>
+
+<div style="flex: 1 1 auto; min-width: 0; display: flex; flex-wrap: wrap; align-items: stretch;">
+
+<aside class="panel" aria-label="คิวตรวจ" style="flex: 1 1 280px; max-width: 320px; padding: 4px 16px 16px 16px; display: flex; flex-direction: column; gap: 14px;">
+<div style="display: flex; flex-direction: column;">
+<h2 style="margin: 0; font-size: 24px; font-weight: 500; line-height: 1.35;">คิวตรวจ</h2>
+<span style="font-size: 12px; font-weight: 400; color: var(--text-muted);">สอบกลางภาค · การใช้แผนที่และเข็มทิศ</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px;">
+<button type="button" aria-pressed="true" style="height: 32px; padding: 0 14px; border-radius: 999px; border: 0; background: var(--primary); color: var(--on-primary); font-size: 13px; font-weight: 400; cursor: pointer;">AI ไม่มั่นใจ 5</button>
+<button type="button" aria-pressed="false" style="height: 32px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-size: 13px; font-weight: 400; cursor: pointer;">รอตรวจ 14</button>
+<button type="button" aria-pressed="false" style="height: 32px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); font-size: 13px; font-weight: 400; cursor: pointer;">ตรวจแล้ว 18</button>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px;">
+<sc-for list="{{queue}}" as="s" hint-placeholder-count="6">
+<a href="#" class="row" aria-current="{{s.current}}" style="{{s.rowStyle}}">
+<span style="width: 32px; height: 32px; flex-shrink: 0; border-radius: 999px; border: 1px solid var(--border); background: var(--primary-soft); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500;">{{s.initials}}</span>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+<span style="font-size: 15px; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{s.name}}</span>
+<span style="font-size: 12px; font-weight: 400; color: var(--text-muted);">{{s.detail}}</span>
+</span>
+<span style="{{s.badgeStyle}}">{{s.badge}}</span>
+</a>
+</sc-for>
+</div>
+</aside>
+
+<main class="main" style="flex: 999 1 560px; min-width: 0; margin: 0 12px 12px 0; padding: 32px 40px 40px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px;">
+<div style="max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px;">
+<div style="display: flex; flex-direction: column; gap: 4px;">
+<nav aria-label="ตำแหน่งหน้า" style="font-size: 12px; font-weight: 400; color: var(--text-muted);"><a href="#" style="color: var(--accent); text-decoration: none;">รายวิชา</a> › <a href="#" style="color: var(--accent); text-decoration: none;">แผนที่และเข็มทิศ</a> › สอบกลางภาค</nav>
+<h1 style="margin: 0; font-size: 28px; font-weight: 500; line-height: 1.3;">ส.อ. กฤชชัย พลอยดี</h1>
+<span style="font-size: 13px; font-weight: 400; color: var(--text-muted); font-variant-numeric: tabular-nums;">ส่งเมื่อ 5 พ.ย. 2569 10:58 · ปรนัยได้ 34/40 · อัตนัยตรวจแล้ว 1 จาก 2 ข้อ</span>
+</div>
+<div style="display: flex; gap: 8px;">
+<button type="button" class="icon-btn" aria-label="คนก่อนหน้า" style="width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer;">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+</button>
+<button type="button" class="icon-btn" aria-label="คนถัดไป" style="width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer;">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+</button>
+</div>
+</div>
+
+<div role="tablist" aria-label="ข้ออัตนัย" style="display: flex; gap: 24px; border-bottom: 1px solid var(--border);">
+<button type="button" role="tab" aria-selected="false" style="padding: 12px 4px; border: 0; background: transparent; color: var(--text-muted); font-size: 15px; font-weight: 400; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color: var(--success);"><path d="M20 6 9 17l-5-5"></path></svg>
+ข้อ 41 · 8/10</button>
+<button type="button" role="tab" aria-selected="true" style="padding: 12px 4px 9px; border: 0; border-bottom: 3px solid var(--primary); background: transparent; color: var(--text); font-size: 15px; font-weight: 500; cursor: pointer;">ข้อ 42 · รอตรวจ</button>
+</div>
+
+<section style="padding: 20px 22px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 14px; display: flex; flex-direction: column; gap: 6px;">
+<span style="font-size: 12px; font-weight: 400; color: var(--text-muted);">โจทย์ · อัตนัย · 10 คะแนน</span>
+<p style="margin: 0; font-size: 16px; font-weight: 400; line-height: 1.65;">อธิบายขั้นตอนการหาตำแหน่งตนเองบนแผนที่ด้วยวิธีเล็งสกัดกลับ พร้อมข้อควรระวัง</p>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 8px;">
+<h2 style="margin: 0; font-size: 16px; font-weight: 500;">คำตอบของผู้เรียน</h2>
+<p style="margin: 0; max-width: 720px; font-size: 16px; font-weight: 300; line-height: 1.65;">เลือกจุดเด่นในภูมิประเทศที่มองเห็นได้และมีอยู่บนแผนที่อย่างน้อย 2 จุด เช่น ยอดเขาและเสาวิทยุ จากนั้นใช้เข็มทิศเล็งไปที่จุดแรกแล้วอ่านค่ามุมภาคทิศ ทำแบบเดียวกันกับจุดที่สอง แล้วลากเส้นจากจุดเด่นแต่ละจุดบนแผนที่ตามมุมที่วัดได้ ตำแหน่งของเราคือจุดที่เส้นทั้งสองตัดกัน</p>
+</section>
+
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start;">
+
+<section style="flex: 1 1 320px; min-width: 0; padding: 20px 22px; border: 1px solid var(--border); border-radius: 14px; display: flex; flex-direction: column; gap: 12px;">
+<h2 style="margin: 0; font-size: 16px; font-weight: 500;">เกณฑ์การให้คะแนน</h2>
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column;">
+<li style="padding: 10px 0; border-bottom: 1px solid var(--border); display: flex; gap: 12px; align-items: flex-start;">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-label="ครบ" role="img" style="flex-shrink: 0; margin-top: 3px; color: var(--success);"><path d="M20 6 9 17l-5-5"></path></svg>
+<span style="flex: 1; font-size: 15px;">เลือกจุดเด่นที่เห็นได้ 2 จุดขึ้นไป</span>
+<span style="font-size: 13px; font-weight: 400; color: var(--text-muted); font-variant-numeric: tabular-nums;">3</span>
+</li>
+<li style="padding: 10px 0; border-bottom: 1px solid var(--border); display: flex; gap: 12px; align-items: flex-start;">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-label="บางส่วน" role="img" style="flex-shrink: 0; margin-top: 3px; color: var(--warning);"><circle cx="12" cy="12" r="10"></circle><path d="M8 12h8"></path></svg>
+<span style="flex: 1; font-size: 15px;">วัดมุมภาคทิศและแปลงเป็นมุมกลับก่อนลากเส้น</span>
+<span style="font-size: 13px; font-weight: 400; color: var(--text-muted); font-variant-numeric: tabular-nums;">4</span>
+</li>
+<li style="padding: 10px 0; border-bottom: 1px solid var(--border); display: flex; gap: 12px; align-items: flex-start;">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-label="ครบ" role="img" style="flex-shrink: 0; margin-top: 3px; color: var(--success);"><path d="M20 6 9 17l-5-5"></path></svg>
+<span style="flex: 1; font-size: 15px;">ลากเส้นและหาจุดตัด</span>
+<span style="font-size: 13px; font-weight: 400; color: var(--text-muted); font-variant-numeric: tabular-nums;">2</span>
+</li>
+<li style="padding: 10px 0; display: flex; gap: 12px; align-items: flex-start;">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-label="ไม่มี" role="img" style="flex-shrink: 0; margin-top: 3px; color: var(--danger);"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+<span style="flex: 1; font-size: 15px;">ข้อควรระวัง เช่น ความคลาดเคลื่อนจากโลหะใกล้ตัว</span>
+<span style="font-size: 13px; font-weight: 400; color: var(--text-muted); font-variant-numeric: tabular-nums;">1</span>
+</li>
+</ul>
+</section>
+
+<section style="flex: 1 1 320px; min-width: 0; padding: 20px 22px; background: var(--info-soft); border-radius: 14px; display: flex; flex-direction: column; gap: 12px;">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;">
+<span style="display: inline-flex; align-items: center; gap: 8px; color: var(--info); font-size: 15px; font-weight: 500;">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"></path><path d="M19 3v4"></path><path d="M17 5h4"></path></svg>
+วิเคราะห์โดย AI</span>
+<span style="height: 24px; padding: 0 10px; display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; background: var(--warning-soft); color: var(--warning); font-size: 12px; font-weight: 500;">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+ความมั่นใจต่ำ</span>
+</div>
+<div style="display: flex; align-items: baseline; gap: 6px;">
+<span style="font-size: 32px; font-weight: 500; line-height: 1.2; font-variant-numeric: tabular-nums;">6</span>
+<span style="font-size: 15px; color: var(--text-muted);">/ 10 คะแนนที่เสนอ</span>
+</div>
+<p style="margin: 0; font-size: 15px; font-weight: 300; line-height: 1.6;">เลือกจุดเด่น 2 จุดครบ (3) อธิบายการวัดมุมภาคทิศแต่ไม่ได้แปลงเป็นมุมกลับก่อนลากเส้น ซึ่งอาจเป็นการละไว้หรือเข้าใจผิด (1 จาก 4) ลากเส้นหาจุดตัดถูกต้อง (2) ไม่กล่าวถึงข้อควรระวัง (0)</p>
+<p style="margin: 0; font-size: 13px; font-weight: 400; color: var(--text-muted);">ไม่มั่นใจเพราะคำตอบตีความได้สองแบบในเกณฑ์ข้อ 2 · ครูเป็นผู้ให้คะแนนสุดท้าย</p>
+</section>
+</div>
+
+<section style="padding-top: 24px; border-top: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-end;">
+<div style="display: flex; flex-direction: column; gap: 6px;">
+<label for="final-score" style="font-size: 14px; font-weight: 400;">คะแนนที่ให้</label>
+<div style="display: flex; align-items: center; gap: 8px;">
+<input id="final-score" type="number" min="0" max="10" value="5" style="width: 88px; height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--primary); background: var(--surface); color: var(--text); font-size: 16px; font-weight: 400; font-variant-numeric: tabular-nums;">
+<span style="font-size: 15px; color: var(--text-muted);">/ 10</span>
+</div>
+</div>
+<div style="flex: 1 1 280px; display: flex; flex-direction: column; gap: 6px;">
+<label for="feedback" style="font-size: 14px; font-weight: 400;">ความเห็นถึงผู้เรียน (ไม่บังคับ)</label>
+<textarea id="feedback" rows="2" style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); font-size: 15px; font-weight: 300; line-height: 1.6; resize: vertical;">ลืมแปลงมุมกลับ ทบทวนบทที่ 4 หน้า 52</textarea>
+</div>
+<div style="width: 100%; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px;">
+<button type="button" class="ghost" style="height: 40px; padding: 0 22px; border-radius: 10px; border: 0; background: transparent; color: var(--text-muted); font-size: 15px; font-weight: 400; cursor: pointer;">ข้ามไปก่อน</button>
+<button type="button" class="btn2" style="height: 40px; padding: 0 22px; display: inline-flex; align-items: center; gap: 8px; border-radius: 10px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); font-size: 15px; font-weight: 400; cursor: pointer;">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"></path><path d="M19 3v4"></path><path d="M17 5h4"></path></svg>
+ใช้คะแนนที่ AI เสนอ</button>
+<button type="button" class="btn1" style="height: 40px; padding: 0 22px; display: inline-flex; align-items: center; gap: 8px; border-radius: 10px; border: 0; background: var(--primary); color: var(--on-primary); font-size: 15px; font-weight: 400; cursor: pointer;">บันทึกแล้วไปคนถัดไป
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+</button>
+</div>
+</section>
+</div>
+</main>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"dark":{"editor":"boolean","default":false},"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var rows = [
+      { initials: 'กช', name: 'ส.อ. กฤชชัย พลอยดี', detail: 'ข้อ 42 · AI เสนอ 6/10', conf: 'low', current: true },
+      { initials: 'อร', name: 'ส.อ. อรรถพล รักษ์ไทย', detail: 'ข้อ 42 · AI เสนอ 4/10', conf: 'low' },
+      { initials: 'พน', name: 'จ.ส.ต. พนมพร ใจกล้า', detail: 'ข้อ 41 · AI เสนอ 7/10', conf: 'low' },
+      { initials: 'สร', name: 'ส.อ. สุรเชษฐ์ ทองมา', detail: 'ข้อ 42 · AI เสนอ 5/10', conf: 'low' },
+      { initials: 'ธว', name: 'ส.อ. ธวัชชัย บุญเกิด', detail: 'ข้อ 41 · AI เสนอ 3/10', conf: 'low' },
+      { initials: 'วพ', name: 'ส.อ. วีระพงษ์ ศรีสุข', detail: 'ข้อ 42 · AI เสนอ 9/10', conf: 'mid' }
+    ];
+    var rowBase = 'padding: 10px 12px; border-radius: 12px; display: flex; align-items: center; gap: 12px; color: var(--text); text-decoration: none; ';
+    var badgeBase = 'height: 24px; padding: 0 10px; display: inline-flex; align-items: center; border-radius: 999px; font-size: 12px; font-weight: 500; white-space: nowrap; ';
+    var queue = rows.map(function (r) {
+      return {
+        initials: r.initials,
+        name: r.name,
+        detail: r.detail,
+        current: r.current ? 'page' : 'false',
+        rowStyle: rowBase + (r.current ? 'background: var(--selected); box-shadow: var(--shadow-xs);' : ''),
+        badge: r.conf === 'low' ? 'ไม่มั่นใจ' : 'ปานกลาง',
+        badgeStyle: badgeBase + (r.conf === 'low' ? 'background: var(--warning-soft); color: var(--warning);' : 'background: var(--primary-soft); color: var(--primary);')
+      };
+    });
+    return { theme: this.props.dark ? 'dark' : '', queue: queue };
+  }
+}
+</script>
+</body>
+</html>

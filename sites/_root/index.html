@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>เอกสาร</title>
+  <style>
+    :root { --bg:#fafaf9; --fg:#1c1917; --muted:#78716c; --line:#e7e5e4; --accent:#2563eb; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg:#1c1917; --fg:#f5f5f4; --muted:#a8a29e; --line:#44403c; --accent:#60a5fa; }
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--fg);
+           font:16px/1.7 system-ui,-apple-system,"Noto Sans Thai",sans-serif; }
+    main { max-width:760px; margin:0 auto; padding:48px 16px; }
+    h1 { margin:0 0 4px; font-size:2rem; }
+    p.lead { margin:0 0 32px; color:var(--muted); }
+    ul { list-style:none; padding:0; margin:0; border-top:1px solid var(--line); }
+    li { border-bottom:1px solid var(--line); }
+    li.empty { padding:14px 0; color:var(--muted); }
+    a { display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;
+        padding:14px 0; color:var(--accent); text-decoration:none; }
+    a:hover span { text-decoration:underline; }
+    small { color:var(--muted); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>เอกสาร</h1>
+    <p class="lead">เอกสารของทุกโปรเจกต์</p>
+    <ul>
+      <li><a href="https://alert.docs.inhdy.com/"><span>ALERT · หน้าเรือธง 3 หน้า</span><small>alert.docs.inhdy.com</small></a></li>
+      <li><a href="https://example.docs.inhdy.com/"><span>โปรเจกต์ตัวอย่าง</span><small>example.docs.inhdy.com</small></a></li>
+      <li><a href="https://why-steamkid.docs.inhdy.com/"><span>ทำไมต้อง Steamkid</span><small>why-steamkid.docs.inhdy.com</small></a></li>
+    </ul>
+  </main>
+</body>
+</html>

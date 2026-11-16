@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-# deploy อัตโนมัติ: ดึงจาก GitHub ถ้ามี commit ใหม่ก็รัน deploy.sh ให้
-#   ./auto-deploy.sh                    เช็กหนึ่งรอบ (systemd timer เรียกทุก 1 นาที)
+# ดึงจาก GitHub ถ้ามี commit ใหม่ก็รัน deploy.sh ให้
+#   ./auto-deploy.sh                    เช็กหนึ่งรอบ — GitHub Actions เรียกผ่าน SSH หลัง push เข้า main
+#   FORCE=1 ./auto-deploy.sh            รัน deploy.sh แม้ไม่มี commit ใหม่
+# ทางเลือก ถ้าไม่ใช้ GitHub Actions: ให้เครื่องเช็กเองทุก 1 นาที
 #   sudo ./auto-deploy.sh --install     ติดตั้ง systemd timer
 #   sudo ./auto-deploy.sh --uninstall   ถอนการติดตั้ง
 #   ดู log: journalctl -u docs-auto-deploy -f
@@ -69,7 +71,15 @@ fi
 git fetch -q origin "$BRANCH"
 old=$(git rev-parse HEAD)
 new=$(git rev-parse FETCH_HEAD)
-[[ $old == "$new" ]] && exit 0
+if [[ $old == "$new" ]]; then
+  if [[ ${FORCE:-} == 1 ]]; then
+    echo "ไม่มี commit ใหม่ (${old:0:7}) — FORCE=1 จึง deploy ใหม่"
+    exec ./deploy.sh
+  fi
+  # systemd ตั้ง INVOCATION_ID — ไม่ต้องเขียน log ทุกนาที
+  [[ -z ${INVOCATION_ID:-} ]] && echo "ล่าสุดอยู่แล้ว (${old:0:7})"
+  exit 0
+fi
 
 git checkout -q -- "${GENERATED[@]}" 2>/dev/null || true
 if ! git merge -q --ff-only FETCH_HEAD; then

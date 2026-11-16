@@ -69,7 +69,7 @@ Docs มักมีแท็บภายใน (ความปลอดภั�
 ## 4. Deploy และยืนยัน
 
 ถ้ารันใน Claude Code บน cloud (ไม่มี docker/เซิร์ฟเวอร์): commit + push แทน — เมื่อเข้า `main`
-แล้ว `auto-deploy.sh` บนเซิร์ฟเวอร์จะ pull + deploy ให้เองภายใน ~1 นาที บอกผู้ใช้ว่าต้อง merge เข้า `main`
+แล้ว GitHub Actions จะตรวจ (`tools/test/check.mjs`) และ deploy ให้เอง บอกผู้ใช้ว่าต้อง merge เข้า `main`
 
 บนเซิร์ฟเวอร์:
 

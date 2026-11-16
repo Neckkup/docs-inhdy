@@ -1,0 +1,67 @@
+# ตรวจเอกสารทุกครั้งที่ push / เปิด PR และ deploy ขึ้นเซิร์ฟเวอร์เมื่อเข้า main
+# Secrets ที่ต้องตั้ง (Settings → Secrets and variables → Actions):
+#   DEPLOY_HOST         ที่อยู่เซิร์ฟเวอร์
+#   DEPLOY_USER         ผู้ใช้ SSH (ต้องรัน docker ได้)
+#   DEPLOY_KEY          SSH private key (คู่กับ public key ใน ~/.ssh/authorized_keys ของผู้ใช้นั้น)
+#   DEPLOY_PATH         โฟลเดอร์ repo บนเซิร์ฟเวอร์ เช่น /srv/docs-inhdy
+#   DEPLOY_KNOWN_HOSTS  ผลของ `ssh-keyscan <host>` (แนะนำ — ถ้าไม่ใส่จะ keyscan ตอนรัน)
+#   DEPLOY_PORT         พอร์ต SSH (ไม่ใส่ = 22)
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: ติดตั้ง jsdom
+        run: npm install --no-save --no-package-lock --silent jsdom@25
+      - name: ตรวจทุกโปรเจกต์ใน sites/
+        run: node tools/test/check.mjs sites
+
+  deploy:
+    needs: check
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy
+      cancel-in-progress: false
+    env:
+      HOST: ${{ secrets.DEPLOY_HOST }}
+      PORT: ${{ secrets.DEPLOY_PORT || '22' }}
+      SSH_USER: ${{ secrets.DEPLOY_USER }}
+      DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+      FORCE: ${{ github.event_name == 'workflow_dispatch' && '1' || '' }}
+    steps:
+      - name: เตรียม SSH
+        env:
+          KEY: ${{ secrets.DEPLOY_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          for v in HOST SSH_USER DEPLOY_PATH KEY; do
+            [ -n "${!v}" ] || { echo "::error::ยังไม่ได้ตั้ง secret สำหรับ $v"; exit 1; }
+          done
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          if [ -n "$KNOWN_HOSTS" ]; then
+            printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          else
+            echo "::warning::ไม่ได้ตั้ง DEPLOY_KNOWN_HOSTS — ใช้ ssh-keyscan แทน (ไม่ได้ยืนยันตัวตนเซิร์ฟเวอร์)"
+            ssh-keyscan -p "$PORT" "$HOST" > ~/.ssh/known_hosts
+          fi
+      - name: Deploy
+        run: |
+          ssh -i ~/.ssh/deploy_key -p "$PORT" -o BatchMode=yes -o ConnectTimeout=20 \
+            "$SSH_USER@$HOST" "cd $(printf %q "$DEPLOY_PATH") && FORCE=$FORCE BRANCH=main ./auto-deploy.sh"

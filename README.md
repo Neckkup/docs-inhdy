@@ -17,20 +17,24 @@
 
 ชื่อโปรเจกต์ใช้ได้แค่ `a-z 0-9 -`
 
-## Deploy อัตโนมัติจาก GitHub
+## Deploy อัตโนมัติ (GitHub Actions)
 
-push เข้า `main` แล้วเว็บอัปเดตเองภายใน ~1 นาที รวมถึงโฟลเดอร์ใหม่ใน `sites/` (ได้ซับโดเมน + HTTPS ให้เลย)
+push เข้า `main` → Actions ตรวจเอกสาร (`tools/test/check.mjs`) → ผ่านแล้ว SSH เข้าเซิร์ฟเวอร์รัน `auto-deploy.sh`
+(pull + `deploy.sh`) โฟลเดอร์ใหม่ใน `sites/` ได้ซับโดเมน + HTTPS ให้เลย ถ้าตรวจไม่ผ่านจะไม่ deploy
+PR ก็ถูกตรวจด้วยแต่ไม่ deploy · deploy ซ้ำเองได้ที่แท็บ Actions → Deploy → Run workflow
 
-ติดตั้งครั้งเดียวบนเซิร์ฟเวอร์ (ในโฟลเดอร์ repo ที่อยู่บน branch `main`):
+ตั้งค่าครั้งเดียว:
 
-```bash
-sudo ./auto-deploy.sh --install
-```
+1. บนเซิร์ฟเวอร์: repo อยู่บน branch `main` และ `git fetch` จาก GitHub ได้โดยไม่ถามรหัส
+   (repo private ใช้ deploy key แบบอ่านอย่างเดียว)
+2. สร้าง SSH key สำหรับ Actions แล้วใส่ public key ใน `~/.ssh/authorized_keys` ของผู้ใช้ที่รัน docker ได้
+3. ใส่ Secrets ใน GitHub (Settings → Secrets and variables → Actions):
+   `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_KEY` (private key), `DEPLOY_PATH` (โฟลเดอร์ repo บนเซิร์ฟเวอร์),
+   `DEPLOY_KNOWN_HOSTS` (ผลของ `ssh-keyscan <host>`), `DEPLOY_PORT` (ถ้าไม่ใช่ 22)
 
-- systemd timer เรียก `auto-deploy.sh` ทุก 1 นาที: `git fetch` → ถ้ามี commit ใหม่ก็ pull แล้วรัน `deploy.sh`
-- ดู log: `journalctl -u docs-auto-deploy -f` · ถอน: `sudo ./auto-deploy.sh --uninstall`
-- เครื่องต้อง `git fetch` จาก GitHub ได้โดยไม่ถามรหัส (repo private ใช้ deploy key แบบอ่านอย่างเดียว)
-- อย่าแก้ไฟล์ค้างบนเซิร์ฟเวอร์โดยไม่ commit — pull จะไม่ผ่านจนกว่าจะเคลียร์
+ตรวจเองในเครื่อง: `npm i --no-save jsdom@25 && node tools/test/check.mjs`
+
+ไม่อยากใช้ Actions: `sudo ./auto-deploy.sh --install` ให้เซิร์ฟเวอร์ดึงเองทุก 1 นาทีแทน (อย่าเปิดทั้งสองทาง)
 
 ## Artifact ที่รองรับ
 
@@ -46,7 +50,8 @@ sudo ./auto-deploy.sh --install
 ## โครงสร้าง
 
 ```
-auto-deploy.sh     pull จาก GitHub + deploy อัตโนมัติ (systemd timer)
+auto-deploy.sh     pull + deploy (Actions เรียกผ่าน SSH)
+.github/workflows/ ตรวจเอกสาร + deploy เมื่อ push เข้า main
 deploy.sh          สร้าง compose.yml + หน้ารวมจาก sites/ แล้ว deploy
 new-project.sh     สร้างโปรเจกต์ใหม่ + deploy
 nginx.conf         ซับโดเมน -> sites/<ชื่อ>/
@@ -59,7 +64,7 @@ templates/canvas/  หน้าตั้งต้นของโปรเจก�
   assets/page.css    สไตล์ร่วมของทุกหน้า (สว่าง/มืด)
   welcome.html       หน้าตัวอย่าง
   guide.html         วิธีเพิ่มหน้า (ลบได้)
-tools/             ตัวแปลง artifact + test harness (jsdom)
+tools/             ตัวแปลง artifact + test harness (jsdom), tools/test/check.mjs = ตัวตรวจก่อน deploy
 ```
 
 DNS: `docs.inhdy.com` และ `*.docs.inhdy.com` ชี้มาที่เครื่องนี้แล้ว — โปรเจกต์ใหม่ไม่ต้องตั้ง DNS เพิ่ม

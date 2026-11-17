@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block body %}
+<section class="card">
+  <h1>เผยแพร่ Artifact</h1>
+  <p class="muted">วางลิงก์ Artifact จาก claude.ai เลือกซับโดเมนและรูปแบบ แล้วระบบจะดึง แปลง และขึ้นเว็บให้</p>
+  {% if error %}<p class="err">{{ error }}</p>{% endif %}
+  <form method="post" action="/publish" class="stack" id="pub">
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <label>ลิงก์ Artifact
+      <input name="link" type="url" required placeholder="https://claude.ai/artifact/…"
+             pattern="https://claude\.ai/(code/)?artifact/[A-Za-z0-9\-]{8,64}/?" value="{{ prefill_link }}">
+    </label>
+    <label>ซับโดเมน
+      <span class="domain">
+        <input name="name" id="name" required maxlength="42" placeholder="my-project"
+               pattern="[a-z0-9]([a-z0-9\-]*[a-z0-9])?" value="{{ prefill_name }}" autocomplete="off">
+        <span class="suffix">.{{ DOMAIN }}</span>
+      </span>
+      <small id="name-msg" class="muted">a-z 0-9 และ -</small>
+    </label>
+    <fieldset>
+      <legend>รูปแบบผลลัพธ์</legend>
+      <div class="formats">
+      {% for key, (label, kinds, desc) in FORMATS.items() %}
+        {% set off = key == 'ai' and not AI_ENABLED %}
+        <label class="fmt{% if off %} off{% endif %}">
+          <input type="radio" name="format" value="{{ key }}" {% if key == 'auto' %}checked{% endif %} {% if off %}disabled{% endif %}>
+          <span><b>{{ label }}</b>
+            <small class="kinds">{% if kinds|length == 4 %}ทุกประเภท{% else %}{{ kinds|join(', ') }}{% endif %}</small>
+            <small>{{ desc }}{% if off %} (ยังไม่ได้ใส่ key ของ LiteLLM){% endif %}</small></span>
+        </label>
+      {% endfor %}
+      </div>
+      <small class="muted">ถ้ารูปแบบที่เลือกใช้กับประเภทของ artifact ไม่ได้ ระบบจะใช้แบบอัตโนมัติแทนและแจ้งไว้ในบันทึก</small>
+    </fieldset>
+    <button class="primary">เผยแพร่</button>
+  </form>
+</section>
+
+{% if jobs %}
+<section class="card">
+  <h2>งานล่าสุด</h2>
+  <table class="list">
+    <thead><tr><th>#</th><th>งาน</th><th>สถานะ</th><th class="hide-sm">โดย</th><th class="hide-sm">เวลา</th></tr></thead>
+    <tbody>
+    {% for j in jobs %}
+      <tr>
+        <td><a href="/jobs/{{ j.id }}">{{ j.id }}</a></td>
+        <td><a href="/jobs/{{ j.id }}">{{ 'ลบ' if j.action == 'delete' else 'เผยแพร่' }} {{ j.name }}</a></td>
+        <td><span class="st st-{{ j.status }}">{{ j.status }}</span></td>
+        <td class="hide-sm">{{ j.username }}</td>
+        <td class="hide-sm muted">{{ j.created_at }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+
+<section class="card">
+  <h2>เอกสารทั้งหมด <small class="muted">{{ projects|length }} โปรเจกต์</small></h2>
+  <input type="search" id="filter" placeholder="ค้นหา…" class="filter">
+  <table class="list" id="projects">
+    <thead><tr><th>เอกสาร</th><th class="hide-sm">ประเภท</th><th class="hide-sm">เจ้าของ</th><th class="hide-sm">อัปเดต</th><th></th></tr></thead>
+    <tbody>
+    {% for p in projects %}
+      <tr>
+        <td><a href="https://{{ p.name }}.{{ DOMAIN }}/" target="_blank" rel="noopener">{{ p.title }}</a>
+            <br><small class="muted">{{ p.name }}.{{ DOMAIN }}</small></td>
+        <td class="hide-sm">{{ p.kind or '—' }}{% if p.format %} <small class="muted">· {{ p.format }}</small>{% endif %}</td>
+        <td class="hide-sm">{{ p.owner or '—' }}</td>
+        <td class="hide-sm muted">{{ p.mtime }}</td>
+        <td class="actions">
+          {% if can_manage(p.name) %}
+            {% if p.source_url %}<a href="/?name={{ p.name|urlencode }}&link={{ p.source_url|urlencode }}#pub">อัปเดต</a>{% endif %}
+            <form method="post" action="/delete" class="inline confirm" data-confirm="ลบ {{ p.name }}.{{ DOMAIN }} ? เว็บจะหายทันที">
+              <input type="hidden" name="csrf" value="{{ csrf }}">
+              <input type="hidden" name="name" value="{{ p.name }}">
+              <button class="link danger">ลบ</button>
+            </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="5" class="muted">ยังไม่มีเอกสาร</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

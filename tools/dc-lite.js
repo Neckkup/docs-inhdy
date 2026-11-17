@@ -1,7 +1,7 @@
 /* dc-lite.js — runtime ขนาดเล็กสำหรับแสดงไฟล์ .dc.html (Claude Design) นอก claude.ai
  * รองรับ: {{path}}, <sc-if>, <sc-for>, class Component extends DCLogic { renderVals() },
- *         data-props defaults (ทับได้ด้วย URL เช่น ?dark=1), onX="{{fn}}", setState
- * ไม่รองรับ: <dc-import>
+ *         data-props defaults (ทับได้ด้วย URL เช่น ?dark=1), onX="{{fn}}", setState,
+ *         <dc-import name="X" prop="..."> (โหลด X.html แล้ว render เป็น component ย่อย ส่ง props ผ่าน attribute)
  */
 (function () {
   'use strict';
@@ -11,14 +11,14 @@
 
   var WHOLE = /^\s*\{\{([^}]+)\}\}\s*$/;
   var ANY = /\{\{([^}]+)\}\}/g;
-  var tpl, inst, root;
+  var defs = {}; // name -> Promise<def>
 
   function DCLogic(props) { this.props = props; this.state = {}; }
   DCLogic.prototype.setState = function (p) {
     Object.assign(this.state, typeof p === 'function' ? p(this.state, this.props) : p);
-    render();
+    if (this.__dc) render(this.__dc);
   };
-  DCLogic.prototype.forceUpdate = function () { render(); };
+  DCLogic.prototype.forceUpdate = function () { if (this.__dc) render(this.__dc); };
   window.DCLogic = DCLogic;
 
   function get(scope, path) {
@@ -34,7 +34,90 @@
     return s.replace(ANY, function (_, p) { var v = get(scope, p); return v == null ? '' : String(v); });
   }
 
-  function build(node, scope, out) {
+  // อ่าน template + logic + props spec จากเอกสาร .dc.html หนึ่งไฟล์
+  function parseDef(doc) {
+    var tpl = doc.querySelector('x-dc');
+    if (!tpl) return null;
+    var script = doc.querySelector('script[data-dc-script]');
+    var spec = {};
+    try { spec = JSON.parse(script && script.getAttribute('data-props') || '{}'); } catch (e) {}
+    var Component = DCLogic;
+    if (script) {
+      try { Component = new Function('DCLogic', script.textContent + '\n;return Component;')(DCLogic); }
+      catch (e) { console.error('dc-lite: logic error', e); }
+    }
+    var helmet = tpl.querySelector('helmet');
+    return { tpl: tpl, spec: spec, Component: Component, helmet: helmet ? Array.prototype.slice.call(helmet.childNodes) : [] };
+  }
+
+  function defaults(spec) {
+    var props = {};
+    Object.keys(spec).forEach(function (k) { if (k[0] !== '$' && spec[k] && 'default' in spec[k]) props[k] = spec[k].default; });
+    return props;
+  }
+
+  function loadDef(name) {
+    if (!defs[name]) {
+      defs[name] = fetch(name + '.html').then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.text();
+      }).then(function (text) {
+        var def = parseDef(new DOMParser().parseFromString(text, 'text/html'));
+        if (!def) throw new Error('no <x-dc> in ' + name + '.html');
+        // ฟอนต์/สไตล์ของ component ย่อย — เพิ่มเข้า <head> ครั้งเดียว
+        var have = {};
+        Array.prototype.forEach.call(document.head.children, function (n) { have[n.outerHTML] = 1; });
+        def.helmet.forEach(function (n) {
+          if (n.nodeType !== 1 || have[n.outerHTML]) return;
+          have[n.outerHTML] = 1;
+          document.head.appendChild(document.importNode(n, true));
+        });
+        return def;
+      });
+    }
+    return defs[name];
+  }
+
+  function mount(def, props, host) {
+    var inst = new def.Component(props);
+    if (!inst.state) inst.state = {};
+    if (!inst.props) inst.props = props;
+    var ctx = { def: def, inst: inst, root: host, kids: [], k: 0 };
+    inst.__dc = ctx;
+    render(ctx);
+    if (inst.componentDidMount) inst.componentDidMount();
+    return ctx;
+  }
+
+  function importNode(n, scope, out, ctx) {
+    var name = n.getAttribute('name');
+    var props = {};
+    Array.prototype.forEach.call(n.attributes, function (a) {
+      if (a.name === 'name' || a.name.indexOf('hint-') === 0) return;
+      var m = a.value.match(WHOLE);
+      props[a.name] = m ? get(scope, m[1]) : interp(a.value, scope);
+    });
+    var i = ctx.k++;
+    var kid = ctx.kids[i];
+    if (!kid || kid.name !== name) {
+      var host = document.createElement('div');
+      host.setAttribute('data-dc-import', name);
+      host.style.display = 'contents';
+      kid = ctx.kids[i] = { name: name, host: host, props: props, ctx: null };
+      loadDef(name).then(function (def) {
+        kid.ctx = mount(def, Object.assign(defaults(def.spec), kid.props), host);
+      }, function (e) { console.error('dc-lite: <dc-import name="' + name + '"> failed: ' + e.message); });
+    } else {
+      kid.props = props;
+      if (kid.ctx) {
+        kid.ctx.inst.props = Object.assign(defaults(kid.ctx.def.spec), props);
+        render(kid.ctx);
+      }
+    }
+    out.appendChild(kid.host);
+  }
+
+  function build(node, scope, out, ctx) {
     node.childNodes.forEach(function (n) {
       if (n.nodeType === 3) {
         out.appendChild(document.createTextNode(n.data.indexOf('{{') >= 0 ? interp(n.data, scope) : n.data));
@@ -45,7 +128,7 @@
       if (tag === 'helmet') return;
       if (tag === 'sc-if') {
         var c = (n.getAttribute('value') || '').match(WHOLE);
-        if (c && get(scope, c[1])) build(n, scope, out);
+        if (c && get(scope, c[1])) build(n, scope, out, ctx);
         return;
       }
       if (tag === 'sc-for') {
@@ -54,11 +137,11 @@
         var as = n.getAttribute('as') || 'item';
         (Array.isArray(list) ? list : []).forEach(function (it, i) {
           var s = Object.create(scope); s[as] = it; s.$index = i;
-          build(n, s, out);
+          build(n, s, out, ctx);
         });
         return;
       }
-      if (tag === 'dc-import') { console.warn('dc-lite: <dc-import> not supported'); return; }
+      if (tag === 'dc-import') { importNode(n, scope, out, ctx); return; }
 
       var el = document.createElementNS(n.namespaceURI, n.localName);
       Array.prototype.forEach.call(n.attributes, function (a) {
@@ -73,46 +156,36 @@
           el.setAttribute(a.name, a.value.indexOf('{{') >= 0 ? interp(a.value, scope) : a.value);
         }
       });
-      build(n, scope, el);
+      build(n, scope, el, ctx);
       out.appendChild(el);
     });
   }
 
-  function render() {
-    var vals = inst.renderVals ? inst.renderVals() : {};
+  function render(ctx) {
+    var vals = ctx.inst.renderVals ? ctx.inst.renderVals() : {};
     var frag = document.createDocumentFragment();
-    build(tpl, vals || {}, frag);
-    root.replaceChildren(frag);
+    ctx.k = 0;
+    build(ctx.def.tpl, vals || {}, frag, ctx);
+    ctx.kids.length = ctx.k;
+    ctx.root.replaceChildren(frag);
   }
 
   function boot() {
-    tpl = document.querySelector('x-dc');
-    var script = document.querySelector('script[data-dc-script]');
-    if (!tpl) return;
-    var helmet = tpl.querySelector('helmet');
-    if (helmet) Array.prototype.slice.call(helmet.childNodes).forEach(function (n) { document.head.appendChild(n); });
+    var def = parseDef(document);
+    if (!def) return;
+    def.helmet.forEach(function (n) { document.head.appendChild(n); });
 
-    var props = {};
-    var spec = {};
-    try { spec = JSON.parse(script && script.getAttribute('data-props') || '{}'); } catch (e) {}
-    Object.keys(spec).forEach(function (k) { if (k[0] !== '$' && 'default' in spec[k]) props[k] = spec[k].default; });
+    var spec = def.spec;
+    var props = defaults(spec);
     new URLSearchParams(location.search).forEach(function (v, k) {
       if (!(k in spec)) return;
       var t = spec[k].editor;
       props[k] = t === 'boolean' ? (v === '1' || v === 'true') : (t === 'int' || t === 'float' || t === 'range') ? +v : v;
     });
 
-    var Component = DCLogic;
-    if (script) {
-      try { Component = new Function('DCLogic', script.textContent + '\n;return Component;')(DCLogic); }
-      catch (e) { console.error('dc-lite: logic error', e); }
-    }
-    inst = new Component(props);
-    if (!inst.state) inst.state = {};
-    root = document.createElement('div');
-    tpl.parentNode.insertBefore(root, tpl);
-    render();
-    if (inst.componentDidMount) inst.componentDidMount();
+    var root = document.createElement('div');
+    def.tpl.parentNode.insertBefore(root, def.tpl);
+    mount(def, props, root);
 
     if (window.top === window && spec.dark) nav(props);
   }

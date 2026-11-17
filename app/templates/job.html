@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}งาน #{{ job.id }}{% endblock %}
+{% block body %}
+<section class="card" id="job" data-id="{{ job.id }}" data-status="{{ job.status }}">
+  <p><a href="/">← กลับ</a></p>
+  <h1>{{ 'ลบ' if job.action == 'delete' else 'เผยแพร่' }} {{ job.name }}.{{ DOMAIN }}</h1>
+  <dl class="meta">
+    <dt>สถานะ</dt><dd><span id="status" class="st st-{{ job.status }}">{{ job.status }}</span></dd>
+    {% if job.source_url %}<dt>ต้นฉบับ</dt><dd class="break">{{ job.source_url }}</dd>{% endif %}
+    {% if job.format %}<dt>รูปแบบ</dt><dd>{{ FORMATS[job.format][0] }}</dd>{% endif %}
+    <dt>ประเภท</dt><dd id="kind">{{ job.kind or '—' }}</dd>
+    <dt>โดย</dt><dd>{{ job.username }} · {{ job.created_at }}</dd>
+  </dl>
+
+  <div id="done" class="ok {% if job.status != 'done' or job.action != 'publish' %}hidden{% endif %}">
+    เผยแพร่แล้ว: <a href="{{ data.url }}" target="_blank" rel="noopener">{{ data.url }}</a>
+  </div>
+
+  <div id="review" class="warn {% if job.status != 'review' %}hidden{% endif %}">
+    <b>ตรวจก่อนเผยแพร่</b> — พบสิ่งที่อาจไม่ควรขึ้นเว็บสาธารณะ:
+    <ul id="warnings">{% for w in data.warnings %}<li>{{ w }}</li>{% endfor %}</ul>
+    {% if mine %}
+    <div class="row">
+      <form method="post" action="/jobs/{{ job.id }}/approve"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="primary">เผยแพร่ต่อ</button></form>
+      <form method="post" action="/jobs/{{ job.id }}/cancel"><input type="hidden" name="csrf" value="{{ csrf }}"><button>ยกเลิก</button></form>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if mine and job.status == 'queued' %}
+  <form method="post" action="/jobs/{{ job.id }}/cancel" id="cancel-q"><input type="hidden" name="csrf" value="{{ csrf }}"><button>ยกเลิกงานนี้</button></form>
+  {% endif %}
+
+  <h2>บันทึก</h2>
+  <pre id="log" class="log">{{ job.log or 'รอคิว…' }}</pre>
+</section>
+{% endblock %}

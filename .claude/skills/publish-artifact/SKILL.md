@@ -34,8 +34,8 @@ argument-hint: <ลิงก์ artifact> [ชื่อโปรเจกต์]
 ## 2B. Design (canvas)
 
 1. read `paths`: `project/canvas.json` และทุกไฟล์ใน `boards`
-2. เช็กว่าใช้ฟีเจอร์ที่ `tools/dc-lite.js` ไม่รองรับไหม: `grep -l '<dc-import' <scratch>/import/<ชื่อ>/project/*.dc.html`
-   ถ้าเจอ → ต้องเพิ่มการรองรับใน dc-lite.js ก่อน (หรือบอกผู้ใช้)
+2. `<dc-import name="X" ...>` รองรับแล้ว (dc-lite โหลด `X.html` แล้วส่ง attribute เป็น props) — ถ้า X ไม่อยู่ใน `boards`
+   ต้องดึง `project/X.dc.html` มาด้วย ไม่งั้นช่องนั้นจะว่าง (render.mjs รายงาน `emptyImports`)
 3. `python3 -I tools/design2html.py <scratch>/import/<ชื่อ> sites/<ชื่อ>`
    ได้: `index.html` (viewer เดียวกับ `templates/canvas/`), `canvas.json`, `<Board>.html` ต่อหน้าจอ
    ทดสอบ viewer: เหมือนข้อ 4 แต่ใช้ `canvas.mjs` แทน `render.mjs`
@@ -45,7 +45,7 @@ argument-hint: <ลิงก์ artifact> [ชื่อโปรเจกต์]
      sh -c "cd /tmp && npm i --silent jsdom@25 >/dev/null 2>&1 && cp /t/render.mjs . && node render.mjs"
    ```
    (ติดตั้ง jsdom ใน /tmp ของ container — อย่า mount แบบเขียนได้ ไม่งั้นได้ node_modules ของ root ค้างในโปรเจกต์)
-   ต้องได้ `leftover{{}}=0` และ `errors=0` ทุกหน้า ทั้ง dark=0 และ dark=1
+   ต้องได้ `leftover{{}}=0`, `emptyImports=0` และ `errors=0` ทุกหน้า ทั้ง dark=0 และ dark=1
 
 ## 2C. Claude Docs
 

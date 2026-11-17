@@ -17,26 +17,48 @@ services:
       - traefik.http.routers.docs-main.tls=true
       - traefik.http.routers.docs-main.tls.certresolver=inhdy-public
       - traefik.http.routers.docs-main.service=docs
-      - traefik.http.routers.docs-app.rule=Host(`docs.app.inhdy.com`)
-      - traefik.http.routers.docs-app.entrypoints=websecure
-      - traefik.http.routers.docs-app.tls=true
-      - traefik.http.routers.docs-app.tls.certresolver=inhdy-public
-      - traefik.http.routers.docs-app.service=docs
       - traefik.http.routers.docs-p-alert.rule=Host(`alert.docs.inhdy.com`)
       - traefik.http.routers.docs-p-alert.entrypoints=websecure
       - traefik.http.routers.docs-p-alert.tls=true
       - traefik.http.routers.docs-p-alert.tls.certresolver=inhdy-public
       - traefik.http.routers.docs-p-alert.service=docs
+      - traefik.http.routers.docs-p-alert-themes.rule=Host(`alert-themes.docs.inhdy.com`)
+      - traefik.http.routers.docs-p-alert-themes.entrypoints=websecure
+      - traefik.http.routers.docs-p-alert-themes.tls=true
+      - traefik.http.routers.docs-p-alert-themes.tls.certresolver=inhdy-public
+      - traefik.http.routers.docs-p-alert-themes.service=docs
       - traefik.http.routers.docs-p-example.rule=Host(`example.docs.inhdy.com`)
       - traefik.http.routers.docs-p-example.entrypoints=websecure
       - traefik.http.routers.docs-p-example.tls=true
       - traefik.http.routers.docs-p-example.tls.certresolver=inhdy-public
       - traefik.http.routers.docs-p-example.service=docs
-      - traefik.http.routers.docs-p-why-steamkid.rule=Host(`why-steamkid.docs.inhdy.com`)
-      - traefik.http.routers.docs-p-why-steamkid.entrypoints=websecure
-      - traefik.http.routers.docs-p-why-steamkid.tls=true
-      - traefik.http.routers.docs-p-why-steamkid.tls.certresolver=inhdy-public
-      - traefik.http.routers.docs-p-why-steamkid.service=docs
+
+  docs-app:
+    build: ./app
+    image: docs-app:local
+    container_name: docs-app
+    restart: unless-stopped
+    user: "${APP_UID:-1001}:${APP_GID:-1002}"
+    environment:
+      APP_SECRET: ${APP_SECRET:?ตั้ง APP_SECRET ใน .env}
+      APP_ORIGIN: https://docs.app.inhdy.com
+      LITELLM_MODEL: ${LITELLM_MODEL:-}
+      LITELLM_ENABLED: ${LITELLM_API_KEY:+1}   # แค่บอกว่ามี key — ตัว key ไม่เข้า container
+      DB_PATH: /data/app.db
+      SITES_DIR: /srv/sites
+    volumes:
+      - ./data:/data
+      - ./sites:/srv/sites:ro
+    networks: [public]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=public
+      - traefik.http.services.docs-app.loadbalancer.server.port=8000
+      - traefik.http.routers.docs-app.rule=Host(`docs.app.inhdy.com`)
+      - traefik.http.routers.docs-app.entrypoints=websecure
+      - traefik.http.routers.docs-app.tls=true
+      - traefik.http.routers.docs-app.tls.certresolver=inhdy-public
+      - traefik.http.routers.docs-app.service=docs-app
 
 networks:
   public:

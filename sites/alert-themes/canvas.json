@@ -1,0 +1,161 @@
+{
+  "title": "ALERT UI Design",
+  "launch": null,
+  "pages": [],
+  "boards": [
+    {
+      "file": "Main.html",
+      "title": "หน้าหลัก · Light (เดิม)",
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 1000,
+      "page": null
+    },
+    {
+      "file": "Dark.html",
+      "title": "หน้าหลัก · Dark (เดิม)",
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 1000,
+      "page": null
+    },
+    {
+      "file": "OptionB.html",
+      "title": "ทางเลือก B · แผงรายการขาว · Light",
+      "x": 0,
+      "y": 1120,
+      "w": 1440,
+      "h": 1000,
+      "page": null
+    },
+    {
+      "file": "OptionC.html",
+      "title": "ทางเลือก C · แถบเมนูเขียวเข้ม · Light",
+      "x": 1520,
+      "y": 1120,
+      "w": 1440,
+      "h": 1000,
+      "page": null
+    },
+    {
+      "file": "OptionBDark.html",
+      "title": "ทางเลือก B · Dark",
+      "x": 0,
+      "y": 2240,
+      "w": 1440,
+      "h": 1000,
+      "page": null
+    },
+    {
+      "file": "OptionCDark.html",
+      "title": "ทางเลือก C · Dark",
+      "x": 1520,
+      "y": 2240,
+      "w": 1440,
+      "h": 1000,
+      "page": null
+    },
+    {
+      "file": "StyleGuide.html",
+      "title": "ธีมสี ฟอนต์ และไอคอน",
+      "x": 0,
+      "y": 3360,
+      "w": 1440,
+      "h": 1640,
+      "page": null
+    },
+    {
+      "file": "ThemeCompare.html",
+      "title": "เปรียบเทียบ 5 ธีม",
+      "x": 0,
+      "y": 5400,
+      "w": 1440,
+      "h": 1180,
+      "page": null
+    },
+    {
+      "file": "ThemeJungle.html",
+      "title": "ชุดที่ 1 · ป่าเขียว (Chakra Petch) · Light",
+      "x": 0,
+      "y": 6700,
+      "w": 1440,
+      "h": 1000,
+      "page": null
+    },
+    {
+      "file": "ThemeJungleDark.html",
+      "title": "ชุดที่ 1 · ป่าเขียว (Chakra Petch) · Dark",
+      "x": 1520,
+      "y": 6700,
+      "w": 1440,
+      "h": 1000,
+      "page": null
+    },
+    {
+      "file": "ThemeKhaki.html",
+      "title": "ชุดที่ 2 · กากี (Prompt) · Light",
+      "x": 0,
+      "y": 7820,
+      "w": 1440,
+      "h": 1000,
+      "page": null
+    },
+    {
+      "file": "ThemeKhakiDark.html",
+      "title": "ชุดที่ 2 · กากี (Prompt) · Dark",
+      "x": 1520,
+      "y": 7820,
+      "w": 1440,
+      "h": 1000,
+      "page": null
+    },
+    {
+      "file": "ThemeNavy.html",
+      "title": "ชุดที่ 3 · กรมท่า-ทอง (Sarabun) · Light",
+      "x": 0,
+      "y": 8940,
+      "w": 1440,
+      "h": 1000,
+      "page": null
+    },
+    {
+      "file": "ThemeNavyDark.html",
+      "title": "ชุดที่ 3 · กรมท่า-ทอง (Sarabun) · Dark",
+      "x": 1520,
+      "y": 8940,
+      "w": 1440,
+      "h": 1000,
+      "page": null
+    },
+    {
+      "file": "ThemeSteel.html",
+      "title": "ชุดที่ 4 · เหล็กกล้า (IBM Plex Sans Thai) · Light",
+      "x": 0,
+      "y": 10060,
+      "w": 1440,
+      "h": 1000,
+      "page": null
+    },
+    {
+      "file": "ThemeSteelDark.html",
+      "title": "ชุดที่ 4 · เหล็กกล้า (IBM Plex Sans Thai) · Dark",
+      "x": 1520,
+      "y": 10060,
+      "w": 1440,
+      "h": 1000,
+      "page": null
+    }
+  ],
+  "notes": [
+    {
+      "text": "ตัวเลือกธีมสำหรับลูกค้า",
+      "x": 0,
+      "y": 5100,
+      "maxW": 2960,
+      "kind": "title1",
+      "page": null
+    }
+  ]
+}

@@ -2,6 +2,9 @@
 # สร้าง compose.yml + หน้ารวมจากโฟลเดอร์ใน sites/ แล้ว deploy
 #   sites/<project>/   ->  https://<project>.docs.inhdy.com
 #   sites/_root/       ->  https://docs.inhdy.com  (สร้างอัตโนมัติ ห้ามแก้มือ)
+#   app/               ->  https://docs.app.inhdy.com  (เว็บจัดการ: login + สั่งเผยแพร่)
+#
+# CHECK_ONLY=<ชื่อ>  เช็ก HTTP เฉพาะโปรเจกต์นั้น (worker ใช้)   CHECK_ONLY=-  ไม่เช็กโปรเจกต์ไหน
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -26,9 +29,18 @@ router() { # name rule
       - traefik.http.routers.$1.entrypoints=websecure
       - traefik.http.routers.$1.tls=true
       - traefik.http.routers.$1.tls.certresolver=$RESOLVER
-      - traefik.http.routers.$1.service=docs
+      - traefik.http.routers.$1.service=${3:-docs}
 EOF
 }
+
+# secret ของ session เว็บจัดการ (สร้างครั้งแรกครั้งเดียว)
+if ! grep -qE '^APP_SECRET=.{32,}$' .env 2>/dev/null; then
+  touch .env && chmod 600 .env
+  sed -i '/^APP_SECRET=/d' .env
+  echo "APP_SECRET=$(python3 -c 'import secrets; print(secrets.token_hex(32))')" >> .env
+  echo "สร้าง APP_SECRET ใน .env แล้ว"
+fi
+mkdir -p data
 
 # ---------- compose.yml ----------
 {
@@ -49,11 +61,35 @@ services:
       - traefik.http.services.docs.loadbalancer.server.port=80
 EOF
   router docs-main "Host(\`$DOMAIN\`)"
-  router docs-app "Host(\`$ALT_DOMAIN\`)"
   # หนึ่ง router ต่อโปรเจกต์ = ใบรับรองแยกกัน โปรเจกต์ไหนพังไม่กระทบตัวอื่น
   for p in "${projects[@]}"; do
     router "docs-p-$p" "Host(\`$p.$DOMAIN\`)"
   done
+  cat <<'EOF'
+
+  docs-app:
+    build: ./app
+    image: docs-app:local
+    container_name: docs-app
+    restart: unless-stopped
+    user: "${APP_UID:-1001}:${APP_GID:-1002}"
+    environment:
+      APP_SECRET: ${APP_SECRET:?ตั้ง APP_SECRET ใน .env}
+      APP_ORIGIN: https://docs.app.inhdy.com
+      LITELLM_MODEL: ${LITELLM_MODEL:-}
+      LITELLM_ENABLED: ${LITELLM_API_KEY:+1}   # แค่บอกว่ามี key — ตัว key ไม่เข้า container
+      DB_PATH: /data/app.db
+      SITES_DIR: /srv/sites
+    volumes:
+      - ./data:/data
+      - ./sites:/srv/sites:ro
+    networks: [public]
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=public
+      - traefik.http.services.docs-app.loadbalancer.server.port=8000
+EOF
+  router docs-app "Host(\`$ALT_DOMAIN\`)" docs-app
   cat <<'EOF'
 
 networks:
@@ -112,12 +148,14 @@ $items    </ul>
 EOF
 
 # ---------- deploy ----------
-docker compose up -d --remove-orphans
+docker compose up -d --build --remove-orphans
 docker exec docs nginx -s reload >/dev/null 2>&1 || true
 
 echo
 echo "https://$DOMAIN/"
+echo "https://$ALT_DOMAIN/  (เว็บจัดการ)"
 for p in "${projects[@]}"; do
+  [[ -n ${CHECK_ONLY:-} && $CHECK_ONLY != "$p" ]] && continue
   code=000
   for _ in $(seq 1 12); do
     code=$(curl -s -o /dev/null -w '%{http_code}' "https://$p.$DOMAIN/" 2>/dev/null || true)

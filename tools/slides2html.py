@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """แปลง Claude Slides ที่ดึงมาแล้ว (project/deck.json + slides/*.html) เป็นเว็บหน้าเดียว
 
-ใช้:  python3 tools/slides2html.py <โฟลเดอร์ที่มี project/> <ไฟล์ปลายทาง.html>
+ใช้:  python3 tools/slides2html.py <โฟลเดอร์ที่มี project/> <ไฟล์ปลายทาง.html> [--present]
+
+--present  เปิดหน้ามาเป็นโหมดนำเสนอเลย (Esc กลับโหมดอ่าน)
 
 - เรียงสไลด์ตาม deck.json "order"
 - ตัด <aside> (โน้ตผู้บรรยาย) ออก ไม่ให้หลุดไปหน้าสาธารณะ
@@ -17,7 +19,7 @@ from pathlib import Path
 W, H = 1920, 1080
 
 
-def main(src: Path, out: Path) -> None:
+def main(src: Path, out: Path, present: bool = False) -> None:
     proj = src / "project"
     deck = json.loads((proj / "deck.json").read_text(encoding="utf-8"))
     css = "\n".join(
@@ -40,6 +42,7 @@ def main(src: Path, out: Path) -> None:
     page = TEMPLATE.format(
         title=title, fonts=fonts, css=css, w=W, h=H,
         slides="\n".join(slides), count=len(slides),
+        autostart="true" if present else "false",
     )
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(page, encoding="utf-8")
@@ -141,6 +144,7 @@ body.present .count {{ display: block; }}
   }});
   addEventListener('resize', fit);
   fit();
+  if ({autostart} || location.hash === '#present') {{ document.body.classList.add('present'); show(0); }}
 }})();
 </script>
 </body>
@@ -148,6 +152,7 @@ body.present .count {{ display: block; }}
 """
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
+    args = [a for a in sys.argv[1:] if a != "--present"]
+    if len(args) != 2:
         sys.exit(__doc__)
-    main(Path(sys.argv[1]), Path(sys.argv[2]))
+    main(Path(args[0]), Path(args[1]), "--present" in sys.argv)

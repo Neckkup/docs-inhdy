@@ -1,0 +1,18 @@
+# systemd user unit — ติดตั้ง:
+#   mkdir -p ~/.config/systemd/user && cp worker/docs-worker.service ~/.config/systemd/user/
+#   systemctl --user daemon-reload && systemctl --user enable --now docs-worker
+#   sudo loginctl enable-linger $USER      # ให้ทำงานต่อแม้ไม่ได้ login ค้างไว้
+# ดู log:  journalctl --user -u docs-worker -f
+[Unit]
+Description=docs.inhdy.com publish worker
+After=network-online.target
+
+[Service]
+WorkingDirectory=%h/docs
+ExecStart=/usr/bin/python3 -I %h/docs/worker/worker.py
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

@@ -49,6 +49,7 @@
       if (atBottom) log.scrollTop = log.scrollHeight;
       $('status').textContent = d.status; $('status').className = 'st st-' + d.status;
       $('kind').textContent = d.kind || '—';
+      if (d.status !== 'queued') $('cancel-q')?.remove();   // ยกเลิกได้เฉพาะตอนรอคิว
       if (live.includes(d.status)) setTimeout(tick, 2000);
       else location.reload();   // review/done/failed: ให้ server วาดปุ่มที่ถูกต้อง
     };

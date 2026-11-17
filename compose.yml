@@ -32,6 +32,11 @@ services:
       - traefik.http.routers.docs-p-example.tls=true
       - traefik.http.routers.docs-p-example.tls.certresolver=inhdy-public
       - traefik.http.routers.docs-p-example.service=docs
+      - traefik.http.routers.docs-p-test.rule=Host(`test.docs.inhdy.com`)
+      - traefik.http.routers.docs-p-test.entrypoints=websecure
+      - traefik.http.routers.docs-p-test.tls=true
+      - traefik.http.routers.docs-p-test.tls.certresolver=inhdy-public
+      - traefik.http.routers.docs-p-test.service=docs
 
   docs-app:
     build: ./app

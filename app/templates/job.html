@@ -9,7 +9,7 @@
     {% if job.source_url %}<dt>ต้นฉบับ</dt><dd class="break">{{ job.source_url }}</dd>{% endif %}
     {% if job.format %}<dt>รูปแบบ</dt><dd>{{ FORMATS[job.format][0] }}</dd>{% endif %}
     <dt>ประเภท</dt><dd id="kind">{{ job.kind or '—' }}</dd>
-    <dt>โดย</dt><dd>{{ job.username }} · {{ job.created_at }}</dd>
+    <dt>โดย</dt><dd>{{ job.username }} · {{ job.created_at|th }}</dd>
   </dl>
 
   <div id="done" class="ok {% if job.status != 'done' or job.action != 'publish' %}hidden{% endif %}">
@@ -31,6 +31,8 @@
   <form method="post" action="/jobs/{{ job.id }}/cancel" id="cancel-q"><input type="hidden" name="csrf" value="{{ csrf }}"><button>ยกเลิกงานนี้</button></form>
   {% endif %}
 
+  <p id="bg-note" class="muted small {% if job.status not in ('queued', 'running', 'approved') %}hidden{% endif %}">
+    งานทำอยู่เบื้องหลัง ปิดหน้านี้หรือกดกลับได้เลย กลับมาดูทีหลังที่ "งานล่าสุด"</p>
   <h2>บันทึก</h2>
   <pre id="log" class="log">{{ job.log or 'รอคิว…' }}</pre>
 </section>

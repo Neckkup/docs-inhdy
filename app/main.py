@@ -12,6 +12,7 @@ import secrets
 import sqlite3
 import time
 from contextlib import contextmanager
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from fastapi import FastAPI, Form, HTTPException, Request
@@ -38,6 +39,22 @@ app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
 app.mount("/static", StaticFiles(directory=HERE / "static"), name="static")
 tpl = Jinja2Templates(directory=HERE / "templates")
 tpl.env.globals.update(DOMAIN=DOMAIN, FORMATS=FORMATS, AI_ENABLED=AI_ENABLED)
+
+TH = timezone(timedelta(hours=7))   # เวลาไทย (ไม่มี DST)
+
+
+def th_time(utc: str | None) -> str:
+    """'2026-11-17 07:21:27' (UTC จาก SQLite) -> '17/11/2026 14:21'"""
+    if not utc:
+        return ""
+    try:
+        dt = datetime.strptime(utc, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
+    except ValueError:
+        return utc
+    return dt.astimezone(TH).strftime("%d/%m/%Y %H:%M")
+
+
+tpl.env.filters["th"] = th_time
 
 
 # ---------------------------------------------------------------- db
@@ -201,9 +218,10 @@ def list_projects():
         r = rows.get(d.name, {"name": d.name, "owner": None, "owner_id": None, "kind": None,
                               "format": None, "source_url": None})
         r["title"] = _title_of(d.name) or r.get("title") or d.name
-        r["mtime"] = time.strftime("%Y-%m-%d %H:%M", time.localtime(d.stat().st_mtime))
+        r["mtime"] = datetime.fromtimestamp(d.stat().st_mtime, TH).strftime("%d/%m/%Y %H:%M")
+        r["mtime_sort"] = d.stat().st_mtime
         out.append(r)
-    out.sort(key=lambda r: r["mtime"], reverse=True)
+    out.sort(key=lambda r: r["mtime_sort"], reverse=True)
     return out
 
 
